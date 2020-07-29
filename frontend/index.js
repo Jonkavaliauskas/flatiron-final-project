@@ -27,7 +27,7 @@ dropDownProfile.addEventListener("click", () => {
   console.log("profilesdropdown")
   lowerBodyStuff.innerHTML = ""
 
-  function fetchProfiles() {
+  function fetchProfile() {
     fetch("http://localhost:3000/api/v1/profiles/" + JSON.parse(localStorage.userProfile).id,
       {
         method: "GET",
@@ -47,55 +47,203 @@ dropDownProfile.addEventListener("click", () => {
     let h5 = ce("h5")
     h5.innerText = profile.name
 
-    
 
     let uni = ce("h5")
     uni.innerText = profile.university
-
-    // let img = ce("img")
-    // img.src = profile.image
-
-    // let ul = ce("ul")
-    // let li = ce("li")
-    // li.innerText = profile.languages
-    // ul.append(li)
 
 
     jDiv.append(h5, uni)
     lowerBodyStuff.append(jDiv)
 
-
-
-    // const cardjonas = qs("div#cardjonas")
-    // const divCardBody = qs("div#maincardbody")
-    // divCardBody.innerHTML = ""
-    // const cardHeader = qs("h6#cardheaderjonas")
-    // cardHeader.innerText = "hi"
-    // const profileDiv = ce("div")
-
-    // let h5 = ce("h5")
-    // h5.innerText = profile.name
-
-    // let h6 = ce("h6")
-    // h6.innerText = profile.university
-
-    // let p = ce("p")
-    // p.innerText = profile.bio
-
-    // profileDiv.id = "profile-div"
-    // profileDiv.append(h5, h6, p)
-    // divCardBody.append(profileDiv)
-
-    // cardjonas.append(cardHeader, divCardBody)
-
-    // mainContent.append(cardjonas)
   }
 
 
-  fetchProfiles()
+  fetchProfile()
+
+  const projectList = ce("ul")
+  let addProfileBtn = false
+
+  const addBtn = ce("button")
+  addBtn.id = "add-project"
+  addBtn.className = "btn btn-light"
+  addBtn.innerText = "Add Project"
+  addBtn.style = "margin-left: 5%; margin-bottom: 25px; margin-top: 25px"
+
+  const formContainer = ce("div")
+  formContainer.id = "form-container"
+  formContainer.style.display = "none"
+
+  
+
+  addBtn.addEventListener("click", () => {
+    formContainer.innerHTML = ""
+    formContainer.style = "margin: 25px"
+
+
+    if (!addProfileBtn) {
+      console.log(addProfileBtn)
+      //formContainer.style.display = "block"
+      addBtn.innerText = "Hide Project Form"
+      // formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv4, inputDiv5)
+      // newProjectForm.append(formGroup)
+      // formContainer.append(newProjectForm)
+      // lowerBodyStuff.append(formContainer)
+    } else {
+      // formContainer.style.display = "none"
+      console.log(formContainer)
+      //formContainer.removeChild(newProjectForm)
+      addBtn.innerText = "Create Project"
+      addProfileBtn = !addProfileBtn
+      return
+    }
+    const newProjectForm = ce("form")
+    const formGroup = ce("div")
+    formGroup.className = "form-group"
+
+    const inputDiv = ce("div")
+    inputDiv.className = "input-group mb-3"
+    inputDiv.innerHTML = '<input name="project-title" type="text" class="form-control" id="new-title" placeholder="Project Title">'
+
+    const inputDiv2 = ce("div")
+    inputDiv2.className = "input-group mb-3"
+    inputDiv2.innerHTML = '<input name="project-description" type="text" class="form-control" id="new-description" placeholder="Project Description">'
+
+    const inputDiv3 = ce("div")
+    inputDiv3.className = "input-group mb-3"
+    inputDiv3.innerHTML = '<input name="project-year" type="number" class="form-control" id="new-year" placeholder="Project Year">'
+
+    const inputDiv4 = ce("div")
+    inputDiv4.className = "input-group mb-3"
+    inputDiv4.innerHTML = '<div class="custom-file"><input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"><label class="custom-file-label" for="inputGroupFile01">Upload Image</label></div>'
+
+    const inputDiv5 = ce("div")
+    inputDiv5.className = "input-group mb-3"
+    inputDiv5.innerHTML = '<button id="sub" type="submit" class="btn btn-light">Add Project</button>'
+
+    formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv4, inputDiv5)
+    newProjectForm.append(formGroup)
+    formContainer.append(newProjectForm)
+    lowerBodyStuff.append(formContainer)
+
+    // hide & seek with the form
+    addProfileBtn = !addProfileBtn;
+    newProjectForm.addEventListener("submit", (event) => {
+      console.log("creatingproject")
+      
+      event.preventDefault()
+
+
+      let configObj = {
+        method: "POST",
+        //mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+          //Authorization: `Bearer ${localStorage.token}` // sending auth token
+          
+          // "Access-Control-Allow-Origin":  "http://127.0.0.1:3000",
+          // "Access-Control-Allow-Methods": "POST",
+          // "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        },
+        body: JSON.stringify({
+          email: JSON.parse(localStorage.currentUser).email,
+          title: newProjectForm[0].value,
+          description: newProjectForm[1].value,
+          year: newProjectForm[2].value,
+          img: newProjectForm[3].value
+        })
+      }
+      // need to fetch only the projects for a specific user_profile
+      console.log(configObj)
+      fetch("http://localhost:3000/api/v1/projects", configObj)
+      .then(res => res.json())
+      .then(project => {
+        addProject(project)
+        newProjectForm.reset()
+      })
+  
+      function fetchProjects() {
+        // fetch("http://localhost:3000/api/v1/projects")
+        fetch("http://localhost:3000/api/v1/projects?sort=-created-at")
+          .then(res => res.json())
+          // .then(console.log)
+          .then(projects => {
+            projects = projects.filter(project => project.user.email == currentUser.email)
+            showProjects(projects)} )
+      }
+  
+  
+      function showProjects(projects) {
+        projects.forEach(project => addProject(project))
+      }
+  
+      function addProject(project) {
+        const li = ce("li")
+        li.className = "wishCard"
+  
+        let blockquote = ce("blockquote")
+        blockquote.className = "blockquote"
+  
+        const p = ce("p")
+        p.className = "mb-0"
+        p.innerText = project.title
+  
+        const img = ce("img")
+        if (project.img === null) {
+          img.src = ""
+        } else {
+          img.src = project.img
+          blockquote.append(img)
+        }
   
   
   
+        const footer = ce("footer")
+        footer.className = "blockquote-footer"
+        footer.innerText = project.description
+  
+        // let editBtn = ce("button")
+        // editBtn.innerText = "Edit Project"
+  
+        // editBtn.addEvenetListener("click", function(){
+        //   //need patch request and that the form would be filled up with the current project's
+        //   //stuff
+        // })
+  
+        let dltBtn = ce("button")
+        dltBtn.className = "btn-danger"
+        dltBtn.innerText = "x"
+  
+        dltBtn.addEventListener("click", function () {
+          // fetch("http://localhost:3000/projects/" + project.id, {
+          //           method: "DELETE"
+          //       })
+          //       .then(() => li.remove())
+          li.remove()
+        })
+  
+  
+  
+        blockquote.append(p, footer)
+        li.append(blockquote, dltBtn)
+        projectList.append(li)
+      }
+  
+      lowerBodyStuff.appendChild(projectList)
+      fetchProjects()
+  
+  
+    }) //end of newProjectForm event listener
+    
+  })
+  //profileForm.appendChild(formContainer)
+  //profileForm.append(addProfileBtn)
+  lowerBodyStuff.appendChild(addBtn)
+
+  
+
+  
+  lowerBodyStuff.appendChild(addBtn)
+  lowerBodyStuff.appendChild(projectList)
   
   
 
@@ -445,165 +593,7 @@ function renderProfileForm() {
   profileForm.appendChild(createProfileElement("resume", "file"))
   //profileForm.appendChild(checkbox)
 
-  const projectList = ce("ul")
-  let addProfileBtn = false
-
-  const addBtn = ce("button")
-  addBtn.id = "add-project"
-  addBtn.className = "btn btn-light"
-  addBtn.innerText = "Add Project"
-  addBtn.style = "margin-left: 5%; margin-bottom: 25px; margin-top: 25px"
-
-  const formContainer = ce("div")
-  formContainer.id = "form-container"
-  formContainer.style.display = "none"
-
-  const newProfileForm = ce("form")
-
-  addBtn.addEventListener("click", () => {
-    formContainer.innerHTML = ""
-    formContainer.style = "margin: 25px"
-
-    const formGroup = ce("div")
-    formGroup.className = "form-group"
-
-    const inputDiv = ce("div")
-    inputDiv.className = "input-group mb-3"
-    inputDiv.innerHTML = '<input name="project-title" type="text" class="form-control" id="new-title" placeholder="Project Title">'
-
-    const inputDiv2 = ce("div")
-    inputDiv2.className = "input-group mb-3"
-    inputDiv2.innerHTML = '<input name="project-description" type="text" class="form-control" id="new-description" placeholder="Project Description">'
-
-    const inputDiv3 = ce("div")
-    inputDiv3.className = "input-group mb-3"
-    inputDiv3.innerHTML = '<input name="project-year" type="number" class="form-control" id="new-year" placeholder="Project Year">'
-
-    const inputDiv4 = ce("div")
-    inputDiv4.className = "input-group mb-3"
-    inputDiv4.innerHTML = '<div class="custom-file"><input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"><label class="custom-file-label" for="inputGroupFile01">Upload Image</label></div>'
-
-    const inputDiv5 = ce("div")
-    inputDiv5.className = "input-group mb-3"
-    inputDiv5.innerHTML = '<button id="sub" type="submit" class="btn btn-light">Add Project</button>'
-
-    formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv4, inputDiv5)
-    newProfileForm.append(formGroup)
-    formContainer.append(newProfileForm)
-    profileForm.append(formContainer)
-
-    // hide & seek with the form
-    addProfileBtn = !addProfileBtn;
-    if (addProfileBtn) {
-      formContainer.style.display = "block"
-      addBtn.innerText = "Hide Project Form"
-    } else {
-      formContainer.style.display = "none"
-      addBtn.innerText = "Create Project"
-    }
-  })
-  //profileForm.appendChild(formContainer)
-  //profileForm.append(addProfileBtn)
-  profileForm.appendChild(addBtn)
-
-  newProfileForm.addEventListener("submit", () => {
-    event.preventDefault()
-
-    let configObj = {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "appliction/json",
-        // "Access-Control-Allow-Origin":  "http://127.0.0.1:3000",
-        // "Access-Control-Allow-Methods": "POST",
-        // "Access-Control-Allow-Headers": "Content-Type, Authorization"
-      },
-      body: JSON.stringify({
-        title: newProfileForm[0].value,
-        description: newProfileForm[1].value,
-        year: newProfileForm[2].value,
-        img: newProfileForm[3].value
-      })
-    }
-    // need to fetch only the projects for a specific user_profile
-    fetch("http://localhost:3000/api/v1/projects", configObj)
-      // .then(res => res.json())
-      .then(project => {
-        addProject(project)
-        newProjectForm.reset()
-      })
-
-    function fetchProjects() {
-      // fetch("http://localhost:3000/api/v1/projects")
-      fetch("http://localhost:3000/api/v1/projects?sort=-created-at")
-        .then(res => res.json())
-        // .then(console.log)
-        .then(projects => showProjects(projects))
-    }
-
-
-    function showProjects(projects) {
-      projects.forEach(project => addProject(project))
-    }
-
-    function addProject(project) {
-      const li = ce("li")
-      li.className = "wishCard"
-
-      let blockquote = ce("blockquote")
-      blockquote.className = "blockquote"
-
-      const p = ce("p")
-      p.className = "mb-0"
-      p.innerText = project.title
-
-      const img = ce("img")
-      if (project.img === null) {
-        img.src = ""
-      } else {
-        img.src = project.img
-        blockquote.append(img)
-      }
-
-
-
-      const footer = ce("footer")
-      footer.className = "blockquote-footer"
-      footer.innerText = project.description
-
-      // let editBtn = ce("button")
-      // editBtn.innerText = "Edit Project"
-
-      // editBtn.addEvenetListener("click", function(){
-      //   //need patch request and that the form would be filled up with the current project's
-      //   //stuff
-      // })
-
-      let dltBtn = ce("button")
-      dltBtn.className = "btn-danger"
-      dltBtn.innerText = "x"
-
-      dltBtn.addEventListener("click", function () {
-        // fetch("http://localhost:3000/projects/" + project.id, {
-        //           method: "DELETE"
-        //       })
-        //       .then(() => li.remove())
-        li.remove()
-      })
-
-
-
-      blockquote.append(p, footer)
-      li.append(blockquote, dltBtn)
-      projectList.append(li)
-    }
-
-    profileForm.appendChild(projectList)
-    fetchProjects()
-
-
-  }) //end of newprofileform event listener
-
+  
 
 
 
