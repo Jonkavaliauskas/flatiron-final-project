@@ -31,11 +31,14 @@ dropDownProfile.addEventListener("click", () => {
     let jDiv = ce("div")
     jDiv.className = "card shadow mb-4"
     let h5 = ce("h5")
-    h5.innerText = "Profile Name:" + profile.name
+    h5.innerText = "Profile Name: " + profile.name
 
 
     let uni = ce("h5")
-    uni.innerText = "Profile University:" + profile.university
+    uni.innerText = "Profile University: " + profile.university
+
+    let bio = ce("h5")
+    bio.innerText = "Profile Bio: " + profile.bio
 
     let ul = ce("ul")
 
@@ -149,7 +152,7 @@ dropDownProfile.addEventListener("click", () => {
       ul.append(li)
     })
   
-    jDiv.append(h5, uni, ul)
+    jDiv.append(h5, uni, bio, ul)
     lowerBodyStuff.append(jDiv)
 
   }
@@ -901,7 +904,7 @@ profilesButton.addEventListener("click", () => {
     uni.innerText = profile.university
 
     let age = ce("h5")
-    age.innerText = "Age:" + profile.age
+    age.innerText = "Age: " + profile.age
 
 
     jDiv.append(h5, uni, age, btn)
