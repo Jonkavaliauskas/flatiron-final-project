@@ -45,14 +45,149 @@ dropDownProfile.addEventListener("click", () => {
     let jDiv = ce("div")
     jDiv.className = "card shadow mb-4"
     let h5 = ce("h5")
-    h5.innerText = profile.name
+    h5.innerText = "Profile Name:" + profile.name
 
 
     let uni = ce("h5")
-    uni.innerText = profile.university
+    uni.innerText = "Profile University:" + profile.university
+
+    let ul = ce("ul")
+
+    function editProject(project){
+      const checkExists = document.getElementById("edit-form-container-" + project.id)
+      console.log(checkExists)
+      if (checkExists){
+        
+        return
+      }
+      console.log(project)
+      console.log(lowerBodyStuff)
+      const editFormContainer = ce("div")
+      editFormContainer.id = "edit-form-container-" + project.id
+      //editFormContainer.style.display = "none"
+
+      const closeBtn = ce("button")
+      closeBtn.innerText = "close form"
+      closeBtn.addEventListener("click", () => {
+        editFormContainer.remove()
+      })
+        const newProjectForm = ce("form")
+        const formGroup = ce("div")
+        formGroup.className = "form-group"
+
+        const inputDiv = ce("div")
+        inputDiv.className = "input-group mb-3"
+        inputDiv.innerHTML = '<input name="project-title" type="text" class="form-control" id="new-title" value= "' + project.title + '">'
+
+        const inputDiv2 = ce("div")
+        inputDiv2.className = "input-group mb-3"
+        inputDiv2.innerHTML = '<input name="project-description" type="text" class="form-control" id="new-description" value= "' + project.description + '">'
+
+        const inputDiv3 = ce("div")
+        inputDiv3.className = "input-group mb-3"
+        inputDiv3.innerHTML = '<input name="project-year" type="number" class="form-control" id="new-year" value= "' + project.year + '">'
+
+        // const inputDiv4 = ce("div")
+        // inputDiv4.className = "input-group mb-3"
+        // inputDiv4.innerHTML = '<div class="custom-file"><input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"><label class="custom-file-label" for="inputGroupFile01">Upload Image</label></div>'
+
+        const inputDiv5 = ce("div")
+        inputDiv5.className = "input-group mb-3"
+        const updateProjectBtn = ce("button")
+        updateProjectBtn.id = "update-project-" + project.id 
+        updateProjectBtn.type = "submit"
+        updateProjectBtn.className = "btn btn-light"
+        updateProjectBtn.innerText = "Update Project"
+        updateProjectBtn.addEventListener("click", () => {
+          event.preventDefault()
+          console.log("update", project.id)
+          // console.log(JSON.parse(localStorage.currentUser).email)
+          // console.log(newProjectForm[0].value)
+          // console.log(newProjectForm[1].value)
+          // console.log(newProjectForm[2].value)
+          // console.log(newProjectForm[3].value)
+          function updateThisProject(project){
+            const p = qs("p#project-item-" + project.id)
+            p.innerText = "Project Title: " + project.title + ", Project Year: " + project.year + ", Project Description: " + project.description
+
+          }
 
 
-    jDiv.append(h5, uni)
+          let configObj = {
+                  method: "PATCH",
+                  headers: {
+                      "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    email: JSON.parse(localStorage.currentUser).email,
+                    title: newProjectForm[0].value,
+                    description: newProjectForm[1].value,
+                    year: newProjectForm[2].value,
+                    img: newProjectForm[3].value
+                  })
+              }
+    
+              fetch("http://localhost:3000/api/v1/projects/" + project.id, configObj)
+              .then(res => res.json())
+              .then(updated_project => {
+                updateThisProject(updated_project)
+                //newProjectForm.reset()
+              })
+
+        })  
+        // inputDiv5.innerHTML = '<button id="update-project" type="submit" class="btn btn-light">Update Project</button>'
+        inputDiv5.append(updateProjectBtn)
+
+        formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv5)
+        newProjectForm.append(formGroup)
+        editFormContainer.append(newProjectForm, closeBtn)
+        lowerBodyStuff.append(editFormContainer)
+      
+    }  
+
+    profile.projects.forEach(project => {
+      console.log(project)
+      const li = ce("li")
+      const p = ce("p")
+      p.id = "project-item-" + project.id
+      p.innerText = "Project Title: " + project.title + ", Project Year: " + project.year + ", Project Description: " + project.description
+      li.append(p)
+      let dltBtn = ce("button")
+      dltBtn.className = "btn-danger"
+      dltBtn.innerText = "x"
+
+      let editBtn = ce("button")
+      editBtn.innerText = "Edit Project"
+      editBtn.style = "margin-left: 5%; margin-bottom: 25px; margin-top: 25px"
+
+
+
+      editBtn.addEventListener("click", function () {
+        event.preventDefault()
+        editProject(project)
+        
+
+
+      })
+
+      dltBtn.addEventListener("click", function () {
+        fetch("http://localhost:3000/api/v1/projects/" + project.id, {
+                  method: "DELETE"
+              })
+              .then(() => li.remove())
+        // li.remove()
+      })
+      li.append(dltBtn, editBtn)
+      ul.append(li)
+    })
+    
+
+    // li.innerText = 
+    // ul.append(li)
+
+
+
+    jDiv.append(h5, uni, ul)
     lowerBodyStuff.append(jDiv)
 
   }
@@ -82,16 +217,9 @@ dropDownProfile.addEventListener("click", () => {
 
     if (!addProfileBtn) {
       console.log(addProfileBtn)
-      //formContainer.style.display = "block"
       addBtn.innerText = "Hide Project Form"
-      // formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv4, inputDiv5)
-      // newProjectForm.append(formGroup)
-      // formContainer.append(newProjectForm)
-      // lowerBodyStuff.append(formContainer)
     } else {
-      // formContainer.style.display = "none"
       console.log(formContainer)
-      //formContainer.removeChild(newProjectForm)
       addBtn.innerText = "Create Project"
       addProfileBtn = !addProfileBtn
       return
@@ -201,12 +329,36 @@ dropDownProfile.addEventListener("click", () => {
         footer.className = "blockquote-footer"
         footer.innerText = project.description
   
-        // let editBtn = ce("button")
-        // editBtn.innerText = "Edit Project"
+        let editBtn = ce("button")
+        editBtn.innerText = "Edit Project"
+        
   
         // editBtn.addEvenetListener("click", function(){
         //   //need patch request and that the form would be filled up with the current project's
         //   //stuff
+        //   event.preventDefault()
+
+        //   let configObj = {
+        //       method: "PATCH",
+        //       headers: {
+        //           "Content-Type": "application/json"
+        //       },
+        //       body: JSON.stringify({
+        //         email: JSON.parse(localStorage.currentUser).email,
+        //         title: newProjectForm[0].value,
+        //         description: newProjectForm[1].value,
+        //         year: newProjectForm[2].value,
+        //         img: newProjectForm[3].value
+        //       })
+        //   }
+
+        //   fetch("http://localhost:3000/api/v1/projects" + project.id, configObj)
+        //   .then(res => res.json())
+        //   .then(updated_project => {
+        //     addProject(updated_project)
+        //     newProjectForm.reset()
+        //   })
+
         // })
   
         let dltBtn = ce("button")
@@ -214,11 +366,11 @@ dropDownProfile.addEventListener("click", () => {
         dltBtn.innerText = "x"
   
         dltBtn.addEventListener("click", function () {
-          // fetch("http://localhost:3000/projects/" + project.id, {
-          //           method: "DELETE"
-          //       })
-          //       .then(() => li.remove())
-          li.remove()
+          fetch("http://localhost:3000/api/v1/projects/" + project.id, {
+                    method: "DELETE"
+                })
+                .then(() => li.remove())
+          // li.remove()
         })
   
   
@@ -258,6 +410,7 @@ const aboutButton = qs("button#aboutsite")
 const profilesButton = qs("button#profilesite")
 const createProfileButton = qs("button#createprofile")
 const deleteProfileButton = qs("button#deleteprofile")
+const editProfileButton = qs("button#editprofile")
 const html = qs("html")
 const landingbody = html.innerHTML
 //const divCardBody = qs("div#maincardbody")
@@ -695,6 +848,119 @@ createProfileButton.addEventListener("click", () => {
 })
 
 
+function editProfileElement(name, value, type = "text") {
+  const Div = ce("div")
+  Div.className = "col-sm-6 mb-3 mb-sm-0"
+  const Input = ce("input")
+  Input.type = type
+  Input.value = value
+  Input.name = name
+  
+  const Br = ce("br")
+  Input.className = "form-control form-control-user"
+  Div.appendChild(Input)
+  Div.appendChild(Br)
+  return Div
+}
+
+
+function renderEditProfileForm() {
+  html.innerHTML = signUpBody
+  const formJonas = qs("form#profilejonas")
+  const profileForm = qs("div#profileform")
+  const formTitle = qs("h1#formtitle")
+  formTitle.innerText = "Update Profile!"
+  const InputEmail = qs("input#InputEmail")
+  const InputPassword = qs("input#InputPassword")
+  const RepeatPassword = qs("input#RepeatPassword")
+  InputEmail.type = "text"
+  InputEmail.placeholder = "Name"
+  InputEmail.name = "name"
+  InputPassword.remove()
+  RepeatPassword.remove()
+
+
+  const thisuser= JSON.parse(localStorage.userProfile)
+  InputEmail.value = thisuser.name
+  profileForm.appendChild(editProfileElement("university", thisuser.university))
+  profileForm.appendChild(editProfileElement("bio", thisuser.bio))
+  profileForm.appendChild(editProfileElement("age", thisuser.age, "number"))
+  // profileForm.appendChild(editProfileElement("image", thisuser.image, "file"))
+  // profileForm.appendChild(editProfileElement("resume", thisuser.resume, "file"))
+  //profileForm.appendChild(checkbox)
+
+  
+
+
+
+  const editToProfile = qs("button#registertoprofile")
+  editToProfile.innerText = "Update Profile"
+
+  const googlebutton = qs("a#registerwithgoogle")
+  const facebookbutton = qs("a#registerwithfacebook")
+  googlebutton.remove()
+  facebookbutton.remove()
+}
+
+
+editProfileButton.addEventListener("click", () => {
+
+  console.log("editprofile")
+
+  
+
+  renderEditProfileForm()
+
+  //const profileForm = qs("div#profileform")
+  const formJonas = qs("form#profilejonas")
+  formJonas.addEventListener("submit", function () {
+    console.log("editing")
+    event.preventDefault()
+    const name = event.target.elements["name"]
+    const university = event.target.elements["university"]
+    const bio = event.target.elements["bio"]
+    const age = event.target.elements["age"]
+    const resume = event.target.elements["resume"]
+    const image = event.target.elements["image"]
+    //let user = currentUser
+
+    console.log(name.value)
+    console.log(university.value)
+    console.log(bio.value)
+    console.log(age.value)
+    
+
+
+    //add hide and seek with the project form
+
+    let configObj = {
+      method: "PATCH",
+      headers:
+      {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        email: JSON.parse(localStorage.currentUser).email,
+        name: name.value,
+        age: age.value,
+        bio: bio.value,
+        university: university.value,
+        
+      })
+    }
+
+    fetch("http://localhost:3000/api/v1/profiles/" + JSON.parse(localStorage.userProfile).id, configObj)
+      .then(res => res.json())
+      .then(profileInfo => {
+        console.log(profileInfo)
+        localStorage.userProfile = JSON.stringify(profileInfo)
+
+      })
+  })
+})
+
+
 
 
 
@@ -720,8 +986,45 @@ profilesButton.addEventListener("click", () => {
   console.log("profiles")
   lowerBodyStuff.innerHTML = ""
   htmlHead.innerHTML += `<link rel="stylesheet" href="index.css" />`
+  
+  let filterDiv = ce("div")
+  filterDiv.id = "filter-div"
+
+  let filterBtn = ce("button")
+  filterBtn.id = "filter-button"
+  filterBtn.innerText = "Filter by age>50: OFF"
+  
+  filterDiv.append(filterBtn)
+  lowerBodyStuff.append(filterDiv)
+
+  filterBtn.addEventListener("click", () => {
+    event.preventDefault()
+    console.log("filterBtnClicked")
+    if(filterBtn.innerText == "Filter by age>50: OFF"){
+        sortProfiles()
+    }else{
+        fetchProfiles()
+    }
+  })
+
+  function sortProfiles(){
+      lowerBodyStuff.innerHTML = ""
+      //can we sort by amending the URL?
+      fetch("http://localhost:3000/api/v1/profiles")
+      .then(res => res.json())
+      .then(profiles => {
+        updatedProfileList = profiles.filter(profile => profile.age > "50")
+        displayProfiles(updatedProfileList)
+        // filterDiv.append(filterBtn)
+        // lowerBodyStuff.append(filterDiv)
+        filterBtn.innerText == "Filter by age>50: ON"
+      })
+  }
 
 
+
+
+  //filter profiles if they have a project on them
   function fetchProfiles() {
     fetch("http://localhost:3000/api/v1/profiles",
       {
@@ -759,6 +1062,9 @@ profilesButton.addEventListener("click", () => {
     let uni = ce("h5")
     uni.innerText = profile.university
 
+    let age = ce("h5")
+    age.innerText = "Age:" + profile.age
+
 
 
     // let ul = ce("ul")
@@ -767,7 +1073,7 @@ profilesButton.addEventListener("click", () => {
     // ul.append(li)
 
 
-    jDiv.append(h5, uni, btn)
+    jDiv.append(h5, uni, age, btn)
     lowerBodyStuff.append(jDiv)
 
 

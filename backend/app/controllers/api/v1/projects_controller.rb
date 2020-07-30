@@ -1,5 +1,5 @@
 class Api::V1::ProjectsController < ApplicationController
-    skip_before_action :logged_in?, only: [:index, :create, :destroy]
+    skip_before_action :logged_in?, only: [:index, :create, :destroy, :update]
     def index 
         projects = Project.all 
         render json: projects
@@ -52,13 +52,19 @@ class Api::V1::ProjectsController < ApplicationController
     
     end
 
-    # def update
-    #     @user = User.find_by(email: params[:email])
-    #     @profile = @user.profile
-    #     @project = @profile.project
-    #     @project.assign_attributes(project_params)
-    #     they typical if user valid
-    # end    
+    def update
+        user = User.find_by(email: params[:email])
+        profile = user.profile
+        project = Project.find_by(id: params[:id])
+        project.profile = profile
+        project.assign_attributes(project_params)
+        if project.valid?
+            project.save
+            render json: project
+        else
+            render json: {error: project.errors.full_messages }, status: :not_acceptable
+        end
+    end    
 
     private 
 
