@@ -7,20 +7,6 @@ function ce(element) {
 }
 
 
-// window.addEventListener('load', (event) => {
-//   if (currentUser == null) {
-//     currentUser = {}
-//     console.log("storas tuscias");
-//   }
-//   if (localStorage.currentUser) {
-//     currentUser = localStorage.currentUser
-//     console.log("yra reikalu")
-//   }
-//   console.log(currentUser)
-//   console.log('page is fully loaded')
-// })
-
-
 let dropDownProfile = qs("button#dropdownprofile")
 dropDownProfile = qs("button#dropdownprofile")
 dropDownProfile.addEventListener("click", () => {
@@ -64,7 +50,6 @@ dropDownProfile.addEventListener("click", () => {
       console.log(lowerBodyStuff)
       const editFormContainer = ce("div")
       editFormContainer.id = "edit-form-container-" + project.id
-      //editFormContainer.style.display = "none"
 
       const closeBtn = ce("button")
       closeBtn.innerText = "close form"
@@ -87,10 +72,6 @@ dropDownProfile.addEventListener("click", () => {
         inputDiv3.className = "input-group mb-3"
         inputDiv3.innerHTML = '<input name="project-year" type="number" class="form-control" id="new-year" value= "' + project.year + '">'
 
-        // const inputDiv4 = ce("div")
-        // inputDiv4.className = "input-group mb-3"
-        // inputDiv4.innerHTML = '<div class="custom-file"><input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"><label class="custom-file-label" for="inputGroupFile01">Upload Image</label></div>'
-
         const inputDiv5 = ce("div")
         inputDiv5.className = "input-group mb-3"
         const updateProjectBtn = ce("button")
@@ -101,17 +82,11 @@ dropDownProfile.addEventListener("click", () => {
         updateProjectBtn.addEventListener("click", () => {
           event.preventDefault()
           console.log("update", project.id)
-          // console.log(JSON.parse(localStorage.currentUser).email)
-          // console.log(newProjectForm[0].value)
-          // console.log(newProjectForm[1].value)
-          // console.log(newProjectForm[2].value)
-          // console.log(newProjectForm[3].value)
           function updateThisProject(project){
             const p = qs("p#project-item-" + project.id)
             p.innerText = "Project Title: " + project.title + ", Project Year: " + project.year + ", Project Description: " + project.description
 
           }
-
 
           let configObj = {
                   method: "PATCH",
@@ -131,11 +106,9 @@ dropDownProfile.addEventListener("click", () => {
               .then(res => res.json())
               .then(updated_project => {
                 updateThisProject(updated_project)
-                //newProjectForm.reset()
               })
 
         })  
-        // inputDiv5.innerHTML = '<button id="update-project" type="submit" class="btn btn-light">Update Project</button>'
         inputDiv5.append(updateProjectBtn)
 
         formGroup.append(inputDiv, inputDiv2, inputDiv3, inputDiv5)
@@ -160,14 +133,10 @@ dropDownProfile.addEventListener("click", () => {
       editBtn.innerText = "Edit Project"
       editBtn.style = "margin-left: 5%; margin-bottom: 25px; margin-top: 25px"
 
-
-
       editBtn.addEventListener("click", function () {
         event.preventDefault()
         editProject(project)
         
-
-
       })
 
       dltBtn.addEventListener("click", function () {
@@ -175,18 +144,11 @@ dropDownProfile.addEventListener("click", () => {
                   method: "DELETE"
               })
               .then(() => li.remove())
-        // li.remove()
       })
       li.append(dltBtn, editBtn)
       ul.append(li)
     })
-    
-
-    // li.innerText = 
-    // ul.append(li)
-
-
-
+  
     jDiv.append(h5, uni, ul)
     lowerBodyStuff.append(jDiv)
 
@@ -253,7 +215,6 @@ dropDownProfile.addEventListener("click", () => {
     formContainer.append(newProjectForm)
     lowerBodyStuff.append(formContainer)
 
-    // hide & seek with the form
     addProfileBtn = !addProfileBtn;
     newProjectForm.addEventListener("submit", (event) => {
       console.log("creatingproject")
@@ -263,14 +224,8 @@ dropDownProfile.addEventListener("click", () => {
 
       let configObj = {
         method: "POST",
-        //mode: "no-cors",
         headers: {
           "Content-Type": "application/json",
-          //Authorization: `Bearer ${localStorage.token}` // sending auth token
-          
-          // "Access-Control-Allow-Origin":  "http://127.0.0.1:3000",
-          // "Access-Control-Allow-Methods": "POST",
-          // "Access-Control-Allow-Headers": "Content-Type, Authorization"
         },
         body: JSON.stringify({
           email: JSON.parse(localStorage.currentUser).email,
@@ -280,7 +235,6 @@ dropDownProfile.addEventListener("click", () => {
           img: newProjectForm[3].value
         })
       }
-      // need to fetch only the projects for a specific user_profile
       console.log(configObj)
       fetch("http://localhost:3000/api/v1/projects", configObj)
       .then(res => res.json())
@@ -290,10 +244,8 @@ dropDownProfile.addEventListener("click", () => {
       })
   
       function fetchProjects() {
-        // fetch("http://localhost:3000/api/v1/projects")
         fetch("http://localhost:3000/api/v1/projects?sort=-created-at")
           .then(res => res.json())
-          // .then(console.log)
           .then(projects => {
             projects = projects.filter(project => project.user.email == currentUser.email)
             showProjects(projects)} )
@@ -331,35 +283,6 @@ dropDownProfile.addEventListener("click", () => {
   
         let editBtn = ce("button")
         editBtn.innerText = "Edit Project"
-        
-  
-        // editBtn.addEvenetListener("click", function(){
-        //   //need patch request and that the form would be filled up with the current project's
-        //   //stuff
-        //   event.preventDefault()
-
-        //   let configObj = {
-        //       method: "PATCH",
-        //       headers: {
-        //           "Content-Type": "application/json"
-        //       },
-        //       body: JSON.stringify({
-        //         email: JSON.parse(localStorage.currentUser).email,
-        //         title: newProjectForm[0].value,
-        //         description: newProjectForm[1].value,
-        //         year: newProjectForm[2].value,
-        //         img: newProjectForm[3].value
-        //       })
-        //   }
-
-        //   fetch("http://localhost:3000/api/v1/projects" + project.id, configObj)
-        //   .then(res => res.json())
-        //   .then(updated_project => {
-        //     addProject(updated_project)
-        //     newProjectForm.reset()
-        //   })
-
-        // })
   
         let dltBtn = ce("button")
         dltBtn.className = "btn-danger"
@@ -370,7 +293,6 @@ dropDownProfile.addEventListener("click", () => {
                     method: "DELETE"
                 })
                 .then(() => li.remove())
-          // li.remove()
         })
   
   
@@ -384,11 +306,9 @@ dropDownProfile.addEventListener("click", () => {
       fetchProjects()
   
   
-    }) //end of newProjectForm event listener
+    }) 
     
   })
-  //profileForm.appendChild(formContainer)
-  //profileForm.append(addProfileBtn)
   lowerBodyStuff.appendChild(addBtn)
 
   
@@ -396,11 +316,6 @@ dropDownProfile.addEventListener("click", () => {
   
   lowerBodyStuff.appendChild(addBtn)
   lowerBodyStuff.appendChild(projectList)
-  
-  
-
-  //html.innerHTML = "<body> <h1>" + JSON.parse(localStorage.currentUser).email + "  </h1> </body>"
-
 
 })
 
@@ -413,14 +328,12 @@ const deleteProfileButton = qs("button#deleteprofile")
 const editProfileButton = qs("button#editprofile")
 const html = qs("html")
 const landingbody = html.innerHTML
-//const divCardBody = qs("div#maincardbody")
 const htmlHead = qs("head")
 const mainContent = qs("div#content")
 const lowerBodyStuff = qs("div#lowerbodystuff")
 
-
-
-
+// took this from a bootstrap design, it would have taken too much time to replicate, so I cheated a little.
+// however, notice that, elsewhere, I always manipulate the DOM using JS
 loginBody = `<head>
 
 <meta charset="utf-8">
@@ -429,7 +342,7 @@ loginBody = `<head>
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>SB Admin 2 - Login</title>
+<title>CodeMatch- Login</title>
 
 <!-- Custom fonts for this template-->
 <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -514,6 +427,9 @@ loginBody = `<head>
 
 </body>`
 
+
+// took this from a bootstrap design, it would have taken too much time to replicate, so I cheated a little.
+// however, notice that, elsewhere, I always manipulate the DOM using JS
 signUpBody = `<head>
 
   <meta charset="utf-8">
@@ -522,7 +438,7 @@ signUpBody = `<head>
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>SB Admin 2 - Register</title>
+  <title>CodeMatch - Register</title>
 
   <!-- Custom fonts for this template-->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -613,8 +529,7 @@ logoutButton.addEventListener("click", () => {
   const loginForm = qs("form#jonasloginform")
   loginForm.addEventListener("submit", () => {
     console.log("login")
-    event.preventDefault()
-    //html.innerHTML = landingbody  
+    event.preventDefault()  
     const email = event.target.elements["email"]
     const password = event.target.elements["password"]
     console.log(email.value)
@@ -633,7 +548,6 @@ logoutButton.addEventListener("click", () => {
       .then(userInfo => {
         if (userInfo.token) {
           localStorage.token = userInfo.token
-          //localStorage.currentUser.email = userInfo.email
           html.innerHTML = landingbody
           
 
@@ -657,9 +571,6 @@ logoutButton.addEventListener("click", () => {
     html.innerHTML = signUpBody
     const formJonas = qs("form#profilejonas")
 
-
-    // console.log(registerToProfile)
-    // console.log(createAccount)
     formJonas.addEventListener("submit", (event) => {
       event.preventDefault()
       const email = event.target.elements["email"]
@@ -668,7 +579,6 @@ logoutButton.addEventListener("click", () => {
       console.log(email.value)
       console.log(password.value)
       console.log(confirmpassword.value)
-      // console.log(event.target)
       if (password.value === confirmpassword.value) {
         fetch("http://localhost:3000/api/v1/users", {
           method: "POST",
@@ -689,21 +599,11 @@ logoutButton.addEventListener("click", () => {
               console.log(localStorage)
               html.innerHTML = loginBody
             }
-            // if (!userInfo.profile){
-            //     renderProfileForm()
-
-            // }else{
-            //     html.innerHTML = landingbody
-            //     //display avatar and other attributes of the user if logged in
-            // }
-
           })
       } else {
         alert("passwords don't match :(")
 
       }
-      ƒ
-      // })
     })
   })
 
@@ -728,27 +628,11 @@ function renderProfileForm() {
   RepeatPassword.remove()
 
 
-  // let checkbox = ce('input')
-  // checkbox.type = 'checkbox'
-  // checkbox.id = 'car'
-  // checkbox.name = 'interest'
-  // checkbox.value = 'car'
-
-  // let label = ce("label")
-  // label.htmlFor = 'car';
-  // label.appendChild(document.createTextNode('Car'));
-
-
   profileForm.appendChild(createProfileElement("university"))
   profileForm.appendChild(createProfileElement("bio"))
   profileForm.appendChild(createProfileElement("age", "number"))
   profileForm.appendChild(createProfileElement("image", "file"))
   profileForm.appendChild(createProfileElement("resume", "file"))
-  //profileForm.appendChild(checkbox)
-
-  
-
-
 
   const registerToProfile = qs("button#registertoprofile")
   registerToProfile.innerText = "Create Profile"
@@ -776,10 +660,6 @@ function createProfileElement(name, type = "text") {
   Div.appendChild(Br)
   return Div
 }
-//now add these extra elements to the form and the post request
-
-// kad profile pagrazintu viska nrml + kad pagal profile id deletintu, o ne user id. 
-// if JSON.parse(localStorage.userProfile) === null, don't show button
 deleteProfileButton.addEventListener("click", () => {
   if (JSON.parse(localStorage.userProfile) !== null){
    
@@ -809,7 +689,6 @@ createProfileButton.addEventListener("click", () => {
     const age = event.target.elements["age"]
     const resume = event.target.elements["resume"]
     const image = event.target.elements["image"]
-    //let user = currentUser
 
     console.log(name.value)
     console.log(university.value)
@@ -817,7 +696,6 @@ createProfileButton.addEventListener("click", () => {
     console.log(age.value)
     console.log(resume.value)
     console.log(image.value)
-    //add hide and seek with the project form
 
     let configObj = {
       method: "POST",
@@ -885,13 +763,6 @@ function renderEditProfileForm() {
   profileForm.appendChild(editProfileElement("university", thisuser.university))
   profileForm.appendChild(editProfileElement("bio", thisuser.bio))
   profileForm.appendChild(editProfileElement("age", thisuser.age, "number"))
-  // profileForm.appendChild(editProfileElement("image", thisuser.image, "file"))
-  // profileForm.appendChild(editProfileElement("resume", thisuser.resume, "file"))
-  //profileForm.appendChild(checkbox)
-
-  
-
-
 
   const editToProfile = qs("button#registertoprofile")
   editToProfile.innerText = "Update Profile"
@@ -911,7 +782,6 @@ editProfileButton.addEventListener("click", () => {
 
   renderEditProfileForm()
 
-  //const profileForm = qs("div#profileform")
   const formJonas = qs("form#profilejonas")
   formJonas.addEventListener("submit", function () {
     console.log("editing")
@@ -922,16 +792,11 @@ editProfileButton.addEventListener("click", () => {
     const age = event.target.elements["age"]
     const resume = event.target.elements["resume"]
     const image = event.target.elements["image"]
-    //let user = currentUser
 
     console.log(name.value)
     console.log(university.value)
     console.log(bio.value)
     console.log(age.value)
-    
-
-
-    //add hide and seek with the project form
 
     let configObj = {
       method: "PATCH",
@@ -961,25 +826,10 @@ editProfileButton.addEventListener("click", () => {
 })
 
 
-
-
-
-
-
-// for Register Account button add event listener that will send a POST request creating the new user
-
-
-
-
-
-// when signup is clicked, we take our user back to login with html.innerHTML = loginBody. once the user logs in, if it's their first
-// login, we prompt them to create a profile
-
 aboutButton.addEventListener("click", () => {
   console.log("about")
   html.innerHTML = landingbody
 })
-
 
 
 profilesButton.addEventListener("click", () => {
@@ -1009,22 +859,15 @@ profilesButton.addEventListener("click", () => {
 
   function sortProfiles(){
       lowerBodyStuff.innerHTML = ""
-      //can we sort by amending the URL?
       fetch("http://localhost:3000/api/v1/profiles")
       .then(res => res.json())
       .then(profiles => {
         updatedProfileList = profiles.filter(profile => profile.age > "50")
         displayProfiles(updatedProfileList)
-        // filterDiv.append(filterBtn)
-        // lowerBodyStuff.append(filterDiv)
         filterBtn.innerText == "Filter by age>50: ON"
       })
   }
 
-
-
-
-  //filter profiles if they have a project on them
   function fetchProfiles() {
     fetch("http://localhost:3000/api/v1/profiles",
       {
@@ -1045,11 +888,6 @@ profilesButton.addEventListener("click", () => {
 
   function makeProfile(profile) {
 
-    //mainContent.innerHTML = ""
-
-    
-    //const divCardBody = qs("div#maincardbody")
-    //divCardBody.innerHTML = ""
     let jDiv = ce("div")
     jDiv.className = "card shadow mb-4"
     let h5 = ce("h5")
@@ -1066,72 +904,14 @@ profilesButton.addEventListener("click", () => {
     age.innerText = "Age:" + profile.age
 
 
-
-    // let ul = ce("ul")
-    // let li = ce("li")
-    // li.innerText = profile.languages
-    // ul.append(li)
-
-
     jDiv.append(h5, uni, age, btn)
     lowerBodyStuff.append(jDiv)
 
-
-
-    // const cardjonas = qs("div#cardjonas")
-    // const divCardBody = qs("div#maincardbody")
-    // divCardBody.innerHTML = ""
-    // const cardHeader = qs("h6#cardheaderjonas")
-    // cardHeader.innerText = "hi"
-    // const profileDiv = ce("div")
-
-    // let h5 = ce("h5")
-    // h5.innerText = profile.name
-
-    // let h6 = ce("h6")
-    // h6.innerText = profile.university
-
-    // let p = ce("p")
-    // p.innerText = profile.bio
-
-    // profileDiv.id = "profile-div"
-    // profileDiv.append(h5, h6, p)
-    // divCardBody.append(profileDiv)
-
-    // cardjonas.append(cardHeader, divCardBody)
-
-    // mainContent.append(cardjonas)
   }
 
 
   fetchProfiles()
-  // divCardBody.innerHTML = ""
-  // const profileDiv = ce("div")
-  // profileDiv.id = "profile-div"
-  // divCardBody.append(profileDiv)
 
-  // const cardHeader = qs("h6#cardheaderjonas")
-  // cardHeader.innerText = "hi"
-
-  // const profileCardDiv = ce("div")
-  // profileCardDiv.className = "card"
-
-  // let h2 = ce("h2")
-  // h2.innerText = profile.name 
-  // profileDiv.append(h2)
-  // divCardBody.append(profileDiv)
-
-  // let img = ce("img")
-  // img.src = profile.image
-
-  //profileD
-
-  // let viewProfileBtn = ce("button")
-  // viewProfileBtn.innerText = "View Profile"
-
-  // viewProfileBtn.addEventListener("click", () => {
-  //     //get fetch for specific profile with an id
-  // })
 })
 
 

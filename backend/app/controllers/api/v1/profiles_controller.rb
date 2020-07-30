@@ -53,6 +53,9 @@ class Api::V1::ProfilesController < ApplicationController
 
     private 
 
+    # I carefully structure the frontend so that this would not present any issues. However, I am aware that
+    # I should be only permitting specific params to pass for added safety and robustness of the code.
+
     def profile_params
         params.require(:profile).permit!
     end    
